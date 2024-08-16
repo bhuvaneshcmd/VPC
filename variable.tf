@@ -1,9 +1,20 @@
-variable "cidr" {
-    type =string
+variable "region" {
+  type    = string
+  default = "us-east-1"
 }
-variable "DNS_Host_Names" {
-    type =bool
+
+variable "cidr_block" {
+  type    = string
 }
-variable "DNS_Support" {
-    type = bool
+
+variable "name" {
+  type    = string
+}
+
+variable "public_subnet_cidrs" {
+  type = list(string)
+}
+
+variable "availability_zones" {
+  type = list(string)
 }
