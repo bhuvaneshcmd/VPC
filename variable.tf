@@ -7,6 +7,3 @@ variable "DNS_Host_Names" {
 variable "DNS_Support" {
     type = bool
 }
-variable "tag_value" {
-    type = string
-}
