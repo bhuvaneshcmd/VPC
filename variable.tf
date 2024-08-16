@@ -12,9 +12,9 @@ variable "name" {
 }
 
 variable "public_subnet_cidrs" {
-  type = string
+  type = list(string)
 }
 
 variable "availability_zones" {
-  type = string
+  type = list(string)
 }
