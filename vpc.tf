@@ -21,30 +21,29 @@ resource "aws_subnet" "public" {
   }
 }
 
-
-resource "aws_internet_gateway" "ig" {
-  vpc_id = aws_vpc.this.id
-  tags = {
-    Name = "internetgateway"
-  }
-}
-
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  tags = {
-    Name = "publicroutetable"
-  }
-}
 
-resource "aws_route" "public_internet_gateway" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.ig.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.this.id
+  }
+
+  tags = {
+    Name = "${var.name}-public"
+  }
 }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+  count      = length(var.public_subnet_cidrs)
+  subnet_id  = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
+resource "aws_internet_gateway" "this" {
+  vpc_id = aws_vpc.this.id
 
+  tags = {
+    Name = "${var.name}-igw"
+  }
+}
