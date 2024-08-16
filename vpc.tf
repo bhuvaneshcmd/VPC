@@ -16,7 +16,7 @@ resource "aws_subnet" "public" {
   availability_zone = var.availability_zones
 
   tags = {
-    Name = "${var.name}-public-${count.index}"
+    Name = "public-nginxsubnet"
   }
 }
 
