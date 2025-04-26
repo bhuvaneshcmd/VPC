@@ -1,0 +1,40 @@
+name: CI/CD Pipeline for MySQL Setup on Amazon Linux
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-mysql:
+    runs-on: ubuntu-latest  # Change this to a custom Amazon Linux environment if needed
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install MySQL client and jq on Amazon Linux
+        run: |
+          sudo yum update -y
+          sudo yum install -y mysql jq aws-cli
+
+      - name: Retrieve DB credentials from Secrets Manager
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value --secret-id my-db-secret --query SecretString --output text)
+          export MYSQL_USER=$(echo $SECRET | jq -r '.username')
+          export MYSQL_PASSWORD=$(echo $SECRET | jq -r '.password')
+          export MYSQL_HOST=$(echo $SECRET | jq -r '.host')
+
+      - name: Run SQL script on MySQL
+        run: |
+          mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h$MYSQL_HOST -P3307 < /path/to/your/sql_script.sql
+
+      - name: Run tests (optional)
+        run: |
+          curl -X GET http://your-application-endpoint/healthcheck
